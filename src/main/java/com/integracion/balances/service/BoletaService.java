@@ -29,7 +29,8 @@ public class BoletaService {
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        List<BoletaResponse> boletaResponse = mapper.convertValue(boletaClient.getBoletas(), new TypeReference<List<BoletaResponse>>() {});
+        List<BoletaResponse> boletaResponse = mapper.convertValue(boletaClient.getBoletas(),
+                new TypeReference<List<BoletaResponse>>() {});
 
         BalanceDocumento balanceDocumento = new BalanceDocumento();
 

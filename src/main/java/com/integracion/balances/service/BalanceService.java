@@ -1,7 +1,66 @@
 package com.integracion.balances.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.integracion.balances.client.BoletaClient;
+import com.integracion.balances.client.FacturaClient;
+import com.integracion.balances.model.Balance;
+import com.integracion.balances.model.boleta.BoletaResponse;
+import com.integracion.balances.model.factura.FacturaResponse;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BalanceService {
+
+    private final BoletaClient boletaClient;
+    private final FacturaClient facturaClient;
+
+    public BalanceService(BoletaClient boletaClient, FacturaClient facturaClient) {
+        this.boletaClient = boletaClient;
+        this.facturaClient = facturaClient;
+    }
+
+    public Balance getBalance(){
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        List<BoletaResponse> boletaResponse = mapper.convertValue(boletaClient.getBoletas(),
+                new TypeReference<List<BoletaResponse>>() {});
+
+        List<FacturaResponse> facturaResponse = mapper.convertValue(facturaClient.getFacturas(),
+                new TypeReference<List<FacturaResponse>>() {});
+
+        Balance balance = new Balance();
+
+        List<Integer> montoBoletas = boletaResponse.stream().map(boletaResponse1 ->
+                boletaResponse1.getMontoBoleta()).collect(Collectors.toList());
+
+        int cantidadBoletas = boletaClient.getBoletas().size();
+        int sumaBoletas = montoBoletas.stream().mapToInt(Integer::intValue).sum();
+
+        List<Integer> montoFacturas = facturaResponse.stream().map(facturaResponse1 ->
+                facturaResponse1.getMontoFactura()).collect(Collectors.toList());
+
+        int cantidadFacturas = facturaClient.getFacturas().size();
+        int sumaFacturas = montoFacturas.stream().mapToInt(Integer::intValue).sum();
+
+        int montoTotalBalance = sumaBoletas - sumaFacturas;
+
+        balance.setBoletasEmitidas(cantidadBoletas);
+        balance.setFacturasPagadas(cantidadFacturas);
+        balance.setMontoTotalBoletas(sumaBoletas);
+        balance.setMontoTotalFacturas(sumaFacturas);
+        balance.setBalanceFinal(montoTotalBalance);
+
+        return balance;
+
+    }
 }

@@ -7,9 +7,9 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Balance {
 
-    private int cantidadBoletas;
+    private int boletasEmitidas;
     private int montoTotalBoletas;
-    private int cantidadFacturas;
+    private int facturasPagadas;
     private int montoTotalFacturas;
     private int balanceFinal;
 }
