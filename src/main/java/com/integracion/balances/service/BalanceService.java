@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.integracion.balances.client.BoletaClient;
 import com.integracion.balances.client.FacturaClient;
 import com.integracion.balances.model.Balance;
+import com.integracion.balances.model.BalanceDocumento;
 import com.integracion.balances.model.boleta.BoletaResponse;
 import com.integracion.balances.model.factura.FacturaResponse;
 import org.springframework.stereotype.Service;
@@ -54,13 +55,25 @@ public class BalanceService {
 
         int montoTotalBalance = sumaBoletas - sumaFacturas;
 
-        balance.setBoletasEmitidas(cantidadBoletas);
-        balance.setFacturasPagadas(cantidadFacturas);
-        balance.setMontoTotalBoletas(sumaBoletas);
-        balance.setMontoTotalFacturas(sumaFacturas);
+        //---------------Balance documento boletas-------------------------
+
+        BalanceDocumento balanceBoletas = new BalanceDocumento();
+        balanceBoletas.setMontoTotal(sumaBoletas);
+        balanceBoletas.setCantidadDocumentos(cantidadBoletas);
+
+        //---------------Balance documento facturas-------------------------
+
+        BalanceDocumento balanceFacturas = new BalanceDocumento();
+
+        balanceFacturas.setCantidadDocumentos(cantidadFacturas);
+        balanceFacturas.setMontoTotal(sumaFacturas);
+
+        //-------------Balance Final ----------------------------------------
+
+        balance.setBoletas(balanceBoletas);
+        balance.setFacturas(balanceFacturas);
         balance.setBalanceFinal(montoTotalBalance);
 
         return balance;
-
     }
 }

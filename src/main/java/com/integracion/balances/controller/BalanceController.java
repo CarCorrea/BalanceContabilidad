@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/balance")
-public class BoletaController {
+public class BalanceController {
 
     private final BoletaService boletaService;
     private final FacturaService facturaService;
     private final BalanceService balanceService;
 
-    public BoletaController(BoletaService boletaService, FacturaService facturaService, BalanceService balanceService) {
+    public BalanceController(BoletaService boletaService, FacturaService facturaService, BalanceService balanceService) {
         this.boletaService = boletaService;
         this.facturaService = facturaService;
         this.balanceService = balanceService;
