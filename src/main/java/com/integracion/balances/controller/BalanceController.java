@@ -6,9 +6,13 @@ import com.integracion.balances.model.BalanceDocumento;
 import com.integracion.balances.service.BalanceService;
 import com.integracion.balances.service.BoletaService;
 import com.integracion.balances.service.FacturaService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/balance")
@@ -34,8 +38,14 @@ public class BalanceController {
         return facturaService.getBalance();
     }
 
-    @GetMapping
+    @GetMapping("/balanceGeneral")
     public Balance balance(){
         return balanceService.getBalance();
+    }
+
+    @GetMapping("/balance/{initialDate}+{finalDate}")
+    public Balance filteredBalance(@PathVariable("initialDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate initialDate,
+                                   @PathVariable("finalDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finalDate){
+        return balanceService.getFilteredBalance(initialDate, finalDate);
     }
 }

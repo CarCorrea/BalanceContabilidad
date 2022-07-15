@@ -10,18 +10,19 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 
 @Service
-public class BalancePDFGeneratorService {
+public class FilteredBalancePDFGeneratorService {
 
     @Autowired
     private BalanceService balanceService;
 
     Locale locale = Locale.US ;
 
-    public void export(HttpServletResponse response) throws IOException {
+    public void export(HttpServletResponse response, LocalDate initialDate, LocalDate finalDate) throws IOException {
 
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, response.getOutputStream());
@@ -31,10 +32,10 @@ public class BalancePDFGeneratorService {
         document.add(documentDate());
         document.add(documentTitle());
         document.add(balanceTitle());
-        document.add(boletaParragraph());
+        document.add(boletaParragraph( initialDate, finalDate));
         document.add(facturaTitle());
-        document.add(facturaParragraph());
-        document.add(totalBalanceParragraph());
+        document.add(facturaParragraph(initialDate, finalDate));
+        document.add(totalBalanceParragraph(initialDate, finalDate));
         document.close();
     }
 
@@ -74,13 +75,13 @@ public class BalancePDFGeneratorService {
         return boletaSectionTitle;
     }
 
-    private Paragraph boletaParragraph() {
+    private Paragraph boletaParragraph(LocalDate initialDate, LocalDate finalDate) {
 
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(10);
 
-        Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo: " + balanceService.getBalance().getBoletas().getCantidadDocumentos() + " boletas \n " +
-                "Monto total boletas: $" + currencyFormatter("boleta"), detailFont);
+        Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo: " + balanceService.getFilteredBalance(initialDate, finalDate).getBoletas().getCantidadDocumentos() + " boletas \n " +
+                "Monto total boletas: $" + currencyFormatter("boleta", initialDate, finalDate), detailFont);
         boletaDetail.setSpacingBefore(15);
         boletaDetail.setIndentationLeft(25);
         return boletaDetail;
@@ -98,31 +99,32 @@ public class BalancePDFGeneratorService {
         return facturaSectionTitle;
     }
 
-    private Paragraph facturaParragraph() {
+    private Paragraph facturaParragraph(LocalDate initialDate, LocalDate finalDate) {
 
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(10);
 
-        Paragraph facturasDetail = new Paragraph("Facturas registradas en periodo: " + balanceService.getBalance().getFacturas().getCantidadDocumentos() + " facturas \n " +
-                "Monto total facturas : $" + currencyFormatter("factura"), detailFont);
+        Paragraph facturasDetail = new Paragraph("Facturas registradas en periodo: "
+                + balanceService.getFilteredBalance(initialDate, finalDate).getFacturas().getCantidadDocumentos() + " facturas \n " +
+                "Monto total facturas : $" + currencyFormatter("factura", initialDate, finalDate), detailFont);
         facturasDetail.setSpacingBefore(15);
         facturasDetail.setIndentationLeft(25);
         return facturasDetail;
     }
 
-    private Paragraph totalBalanceParragraph() {
+    private Paragraph totalBalanceParragraph(LocalDate initialDate, LocalDate finalDate) {
 
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(10);
 
-        Paragraph balanceDetail = new Paragraph("Balance periodo: $" + currencyFormatter("balance"), detailFont);
+        Paragraph balanceDetail = new Paragraph("Balance periodo: $" + currencyFormatter("balance", initialDate, finalDate), detailFont);
         balanceDetail.setSpacingBefore(20);
         balanceDetail.setIndentationLeft(25);
 
         return balanceDetail;
     }
 
-    private String currencyFormatter(String documento){
+    private String currencyFormatter(String documento, LocalDate initialDate, LocalDate finalDate){
 
         String monto = "";
 
@@ -130,15 +132,14 @@ public class BalancePDFGeneratorService {
         numberFormatter = NumberFormat.getNumberInstance(locale);
 
         if (documento=="boleta"){
-            monto = numberFormatter.format(balanceService.getBalance().getBoletas().getMontoTotal());
+            monto = numberFormatter.format(balanceService.getFilteredBalance(initialDate, finalDate).getBoletas().getMontoTotal());
 
         }else if (documento=="factura"){
-            monto = numberFormatter.format(balanceService.getBalance().getFacturas().getMontoTotal());
+            monto = numberFormatter.format(balanceService.getFilteredBalance(initialDate, finalDate).getFacturas().getMontoTotal());
 
         }else {
-            monto = numberFormatter.format(balanceService.getBalance().getBalanceFinal());
+            monto = numberFormatter.format(balanceService.getFilteredBalance(initialDate, finalDate).getBalanceFinal());
         }
         return monto;
     }
-
 }
