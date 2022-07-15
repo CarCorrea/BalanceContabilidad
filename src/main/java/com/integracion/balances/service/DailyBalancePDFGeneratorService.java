@@ -32,7 +32,7 @@ public class DailyBalancePDFGeneratorService {
 
         document.open();
 
-        document.add(documentDate());
+        document.add(documentEmitionDate());
         document.add(documentTitle());
         document.add(documentSubtitle(date));
         document.add(balanceTitle());
@@ -43,7 +43,7 @@ public class DailyBalancePDFGeneratorService {
         document.close();
     }
 
-    private Paragraph documentDate(){
+    private Paragraph documentEmitionDate(){
 
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(6);
@@ -82,7 +82,7 @@ public class DailyBalancePDFGeneratorService {
         Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         paragraphFont.setSize(12);
 
-        Paragraph boletaSectionTitle = new Paragraph("Boletas registradas", paragraphFont);
+        Paragraph boletaSectionTitle = new Paragraph("Boletas registradas ", paragraphFont);
         boletaSectionTitle.setAlignment(Paragraph.ALIGN_LEFT);
 
         return boletaSectionTitle;
@@ -93,7 +93,8 @@ public class DailyBalancePDFGeneratorService {
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(10);
 
-        Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo: " + balanceService.getDailyBalance(date).getBoletas().getCantidadDocumentos() + " boletas \n " +
+        Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo en día: " +
+                balanceService.getDailyBalance(date).getBoletas().getCantidadDocumentos() + " boletas \n " +
                 "Monto total boletas: $" + currencyFormatter("boleta", date), detailFont);
         boletaDetail.setSpacingBefore(15);
         boletaDetail.setIndentationLeft(25);
@@ -105,7 +106,7 @@ public class DailyBalancePDFGeneratorService {
         Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         paragraphFont.setSize(12);
 
-        Paragraph facturaSectionTitle = new Paragraph("Facturas registradas", paragraphFont);
+        Paragraph facturaSectionTitle = new Paragraph("Facturas registradas en día", paragraphFont);
         facturaSectionTitle.setAlignment(Paragraph.ALIGN_LEFT);
         facturaSectionTitle.setSpacingBefore(20);
 

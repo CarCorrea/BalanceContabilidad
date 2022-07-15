@@ -64,7 +64,7 @@ public class PDFExportController {
 
     }
 
-    @GetMapping("/pdf/generate/{initialDate}+{finalDate}")
+    @GetMapping("/pdf/generate/{initialDate}/{finalDate}")
     public void generatePDFByDate(HttpServletResponse response, @PathVariable("initialDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate initialDate,
                                   @PathVariable("finalDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate finalDate ) throws IOException {
         response.setContentType("application/pdf");

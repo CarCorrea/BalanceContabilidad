@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -21,6 +22,8 @@ public class FilteredBalancePDFGeneratorService {
     private BalanceService balanceService;
 
     Locale locale = Locale.US ;
+    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    String currentDateTime = dateFormat.format(new Date());
 
     public void export(HttpServletResponse response, LocalDate initialDate, LocalDate finalDate) throws IOException {
 
@@ -31,8 +34,9 @@ public class FilteredBalancePDFGeneratorService {
 
         document.add(documentDate());
         document.add(documentTitle());
+        document.add(documentDatePeriod(initialDate, finalDate));
         document.add(balanceTitle());
-        document.add(boletaParragraph( initialDate, finalDate));
+        document.add(boletaParragraph(initialDate, finalDate));
         document.add(facturaTitle());
         document.add(facturaParragraph(initialDate, finalDate));
         document.add(totalBalanceParragraph(initialDate, finalDate));
@@ -40,9 +44,6 @@ public class FilteredBalancePDFGeneratorService {
     }
 
     private Paragraph documentDate(){
-
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        String currentDateTime = dateFormat.format(new Date());
 
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(6);
@@ -65,12 +66,28 @@ public class FilteredBalancePDFGeneratorService {
         return documentTitle;
     }
 
+    private Paragraph documentDatePeriod(LocalDate initialDate, LocalDate finalDate){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        Font detailFont = FontFactory.getFont(FontFactory.HELVETICA_OBLIQUE);
+        detailFont.setSize(11);
+
+        Paragraph documentPeriod = new Paragraph("Periodo: " +  initialDate.format(formatter)
+                + " - " + finalDate.format(formatter), detailFont);
+        documentPeriod.setSpacingBefore(15);
+        documentPeriod.setAlignment(Paragraph.ALIGN_LEFT);
+
+        return documentPeriod;
+
+    }
+
     private Paragraph balanceTitle(){
         Font paragraphFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         paragraphFont.setSize(12);
 
         Paragraph boletaSectionTitle = new Paragraph("Boletas registradas", paragraphFont);
         boletaSectionTitle.setAlignment(Paragraph.ALIGN_LEFT);
+        boletaSectionTitle.setSpacingBefore(15);
 
         return boletaSectionTitle;
     }
@@ -80,9 +97,10 @@ public class FilteredBalancePDFGeneratorService {
         Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
         detailFont.setSize(10);
 
-        Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo: " + balanceService.getFilteredBalance(initialDate, finalDate).getBoletas().getCantidadDocumentos() + " boletas \n " +
+        Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo: " +
+                balanceService.getFilteredBalance(initialDate, finalDate).getBoletas().getCantidadDocumentos() + " boletas \n " +
                 "Monto total boletas: $" + currencyFormatter("boleta", initialDate, finalDate), detailFont);
-        boletaDetail.setSpacingBefore(15);
+
         boletaDetail.setIndentationLeft(25);
         return boletaDetail;
     }

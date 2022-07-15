@@ -126,8 +126,6 @@ public class BalanceService {
         balanceFacturas.setCantidadDocumentos(cantidadFacturas);
         balanceFacturas.setMontoTotal(sumaFacturas);
 
-
-
         Balance filteredBalance = new Balance();
 
         filteredBalance.setBoletas(balanceBoletas);
