@@ -1,6 +1,7 @@
 package com.integracion.balances.controller;
 
 import com.integracion.balances.service.BalancePDFGeneratorService;
+import com.integracion.balances.service.DailyBalancePDFGeneratorService;
 import com.integracion.balances.service.FilteredBalancePDFGeneratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,9 +25,13 @@ public class PDFExportController {
     @Autowired
     private final FilteredBalancePDFGeneratorService filteredBalancePDFGeneratorService;
 
-    public PDFExportController(BalancePDFGeneratorService pdfGeneratorService, FilteredBalancePDFGeneratorService filteredBalancePDFGeneratorService) {
+    @Autowired
+    private final DailyBalancePDFGeneratorService dailyBalancePDFGeneratorService;
+
+    public PDFExportController(BalancePDFGeneratorService pdfGeneratorService, FilteredBalancePDFGeneratorService filteredBalancePDFGeneratorService, DailyBalancePDFGeneratorService dailyBalancePDFGeneratorService) {
         this.pdfGeneratorService = pdfGeneratorService;
         this.filteredBalancePDFGeneratorService = filteredBalancePDFGeneratorService;
+        this.dailyBalancePDFGeneratorService = dailyBalancePDFGeneratorService;
     }
 
     @GetMapping("/pdf/generate")
@@ -41,6 +46,21 @@ public class PDFExportController {
         response.setHeader(headerKey, headerValue);
 
         this.pdfGeneratorService.export(response);
+
+    }
+
+    @GetMapping("/pdf/generate/{date}")
+    public void generateDailyBalancePDF(HttpServletResponse response, @PathVariable("date") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate date) throws IOException {
+        response.setContentType("application/pdf");
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy:hh:mm:ss");
+        String currentDateTime = dateFormat.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
+
+        response.setHeader(headerKey, headerValue);
+
+        this.dailyBalancePDFGeneratorService.export(response, date);
 
     }
 
