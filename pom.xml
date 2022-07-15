@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.integracion</groupId>
 	<artifactId>balances</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<name>balances</name>
 	<description>Servicio de balances para contabilidad</description>
 	<properties>

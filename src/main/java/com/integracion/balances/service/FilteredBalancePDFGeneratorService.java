@@ -100,7 +100,7 @@ public class FilteredBalancePDFGeneratorService {
         Paragraph boletaDetail = new Paragraph("Boletas emitidas en periodo: " +
                 balanceService.getFilteredBalance(initialDate, finalDate).getBoletas().getCantidadDocumentos() + " boletas \n " +
                 "Monto total boletas: $" + currencyFormatter("boleta", initialDate, finalDate), detailFont);
-
+        boletaDetail.setSpacingBefore(15);
         boletaDetail.setIndentationLeft(25);
         return boletaDetail;
     }
@@ -132,7 +132,7 @@ public class FilteredBalancePDFGeneratorService {
 
     private Paragraph totalBalanceParragraph(LocalDate initialDate, LocalDate finalDate) {
 
-        Font detailFont = FontFactory.getFont(FontFactory.HELVETICA);
+        Font detailFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         detailFont.setSize(10);
 
         Paragraph balanceDetail = new Paragraph("Balance periodo: $" + currencyFormatter("balance", initialDate, finalDate), detailFont);
